@@ -20,21 +20,25 @@ DECLARE	@EjercicioD		int = YEAR(GETDATE()),
 		@Ejercicio4	int = NULL, 
 		@Ejercicio5	int = NULL
 
+		DELETE FROM nvk_tb_ExpIngresoNeto_Imp WHERE SPID = @@SPID
 
 DECLARE @VentasBase TABLE (
-					Cliente varchar(10) ,
-					Nombre	varchar(100),
-					Ejercicio int,
-					VentaNeta	float,
-					Agente varchar(10)
+					Cliente			varchar(10) ,
+					Nombre			varchar(100),
+					Ejercicio		int,
+					VentaNeta		float,
+					Agente			varchar(10),
+					NombreAgente	varchar(100),
+					Gerente			varchar(10)
 					)
 
 
 DECLARE @MaxMin		TABLE (
-					Cliente varchar(10),
+					Cliente		varchar(10),
 					vMax		float NULL,
 					vMin		float NULL
 )
+
 
 
 SET @EjercicioA = (@EjercicioD-1)
@@ -54,26 +58,28 @@ SELECT
 DISTINCT V.Cliente
 	,NombreCliente
 	,YEAR(FechaEmision) AS Ejercicio
-	--,CASE WHEN YEAR(FechaEmision) = 2021 THEN COALESCE(ROUND((SUM(ImporteFactura)-SUM(ImporteDevuelto)-SUM(ImporteCancelado) + SUM(ImporteCancelNCargo)-SUM(ImporteNotaCred)),4),0)  ELSE 0 END AS VTotalEjercicio1
-	--,CASE WHEN YEAR(FechaEmision) = 2022 THEN COALESCE(ROUND((SUM(ImporteFactura)-SUM(ImporteDevuelto)-SUM(ImporteCancelado) + SUM(ImporteCancelNCargo)-SUM(ImporteNotaCred)),4),0)  ELSE 0 END AS VTotalEjercicio2
-	--,CASE WHEN YEAR(FechaEmision) = 2023 THEN COALESCE(ROUND((SUM(ImporteFactura)-SUM(ImporteDevuelto)-SUM(ImporteCancelado) + SUM(ImporteCancelNCargo)-SUM(ImporteNotaCred)),4),0)  ELSE 0 END AS VTotalEjercicio3
-	--,CASE WHEN YEAR(FechaEmision) = 2024 THEN COALESCE(ROUND((SUM(ImporteFactura)-SUM(ImporteDevuelto)-SUM(ImporteCancelado) + SUM(ImporteCancelNCargo)-SUM(ImporteNotaCred)),4),0)  ELSE 0 END AS VTotalEjercicio4
-	--,CASE WHEN YEAR(FechaEmision) = 2025 THEN COALESCE(ROUND((SUM(ImporteFactura)-SUM(ImporteDevuelto)-SUM(ImporteCancelado) + SUM(ImporteCancelNCargo)-SUM(ImporteNotaCred)),4),0)  ELSE 0 END AS VTotalEjercicio5
+	--,CASE WHEN YEAR(FechaEmision) = 2021 THEN COALESCE((SUM(ImporteFactura)-SUM(ImporteDevuelto)-SUM(ImporteCancelado) + SUM(ImporteCancelNCargo)-SUM(ImporteNotaCred)),0)  ELSE 0 END AS VTotalEjercicio1
+	--,CASE WHEN YEAR(FechaEmision) = 2022 THEN COALESCE((SUM(ImporteFactura)-SUM(ImporteDevuelto)-SUM(ImporteCancelado) + SUM(ImporteCancelNCargo)-SUM(ImporteNotaCred)),0)  ELSE 0 END AS VTotalEjercicio2
+	--,CASE WHEN YEAR(FechaEmision) = 2023 THEN COALESCE((SUM(ImporteFactura)-SUM(ImporteDevuelto)-SUM(ImporteCancelado) + SUM(ImporteCancelNCargo)-SUM(ImporteNotaCred)),0)  ELSE 0 END AS VTotalEjercicio3
+	--,CASE WHEN YEAR(FechaEmision) = 2024 THEN COALESCE((SUM(ImporteFactura)-SUM(ImporteDevuelto)-SUM(ImporteCancelado) + SUM(ImporteCancelNCargo)-SUM(ImporteNotaCred)),0)  ELSE 0 END AS VTotalEjercicio4
+	--,CASE WHEN YEAR(FechaEmision) = 2025 THEN COALESCE((SUM(ImporteFactura)-SUM(ImporteDevuelto)-SUM(ImporteCancelado) + SUM(ImporteCancelNCargo)-SUM(ImporteNotaCred)),0)  ELSE 0 END AS VTotalEjercicio5
 	
 	
-	,CASE WHEN YEAR(FechaEmision) = @Ejercicio1  THEN ROUND((SUM(ImporteFactura)-SUM(ImporteDevuelto)-SUM(ImporteCancelado) + SUM(ImporteCancelNCargo)-SUM(ImporteNotaCred)),4)
-	      WHEN YEAR(FechaEmision) = @Ejercicio2 THEN ROUND((SUM(ImporteFactura)-SUM(ImporteDevuelto)-SUM(ImporteCancelado) + SUM(ImporteCancelNCargo)-SUM(ImporteNotaCred)),4)
-			WHEN YEAR(FechaEmision) = @Ejercicio3 THEN ROUND((SUM(ImporteFactura)-SUM(ImporteDevuelto)-SUM(ImporteCancelado) + SUM(ImporteCancelNCargo)-SUM(ImporteNotaCred)),4)
-			WHEN YEAR(FechaEmision) = @Ejercicio4 THEN ROUND((SUM(ImporteFactura)-SUM(ImporteDevuelto)-SUM(ImporteCancelado) + SUM(ImporteCancelNCargo)-SUM(ImporteNotaCred)),4)
-			WHEN YEAR(FechaEmision) = @Ejercicio5 THEN ROUND((SUM(ImporteFactura)-SUM(ImporteDevuelto)-SUM(ImporteCancelado) + SUM(ImporteCancelNCargo)-SUM(ImporteNotaCred)),4)
+	,CASE WHEN YEAR(FechaEmision) = @Ejercicio1  THEN (SUM(ImporteFactura)-SUM(ImporteDevuelto)-SUM(ImporteCancelado) + SUM(ImporteCancelNCargo)-SUM(ImporteNotaCred))
+	      WHEN YEAR(FechaEmision) = @Ejercicio2 THEN (SUM(ImporteFactura)-SUM(ImporteDevuelto)-SUM(ImporteCancelado) + SUM(ImporteCancelNCargo)-SUM(ImporteNotaCred))
+			WHEN YEAR(FechaEmision) = @Ejercicio3 THEN (SUM(ImporteFactura)-SUM(ImporteDevuelto)-SUM(ImporteCancelado) + SUM(ImporteCancelNCargo)-SUM(ImporteNotaCred))
+			WHEN YEAR(FechaEmision) = @Ejercicio4 THEN (SUM(ImporteFactura)-SUM(ImporteDevuelto)-SUM(ImporteCancelado) + SUM(ImporteCancelNCargo)-SUM(ImporteNotaCred))
+			WHEN YEAR(FechaEmision) = @Ejercicio5 THEN (SUM(ImporteFactura)-SUM(ImporteDevuelto)-SUM(ImporteCancelado) + SUM(ImporteCancelNCargo)-SUM(ImporteNotaCred))
 			ELSE 0 END AS VentaNeta,
-	v.AgenteCliente
-   FROM  NVK_VW_HistVtaCte_2021_Hoy v 
+	v.AgenteCliente,
+	a.Nombre,
+	MAX(CASE WHEN COALESCE(a.ReportaA,'') = '' THEN a.Agente ELSE a.ReportaA END)
+   FROM  NVK_VW_HistVtaCte_2021_Hoy v
+   JOIN Agente	a							ON a.Agente=v.AgenteCliente
    WHERE v.Mov NOT IN ('Factura Activo Fijo')
 	 AND YEAR(FechaEmision) BETWEEN @EjercicioD AND @EjercicioA
 	 AND v.Estatus = 'CONCLUIDO'
-	 --AND Cliente = '00'
-      GROUP BY YEAR(FechaEmision),v.Cliente,v.NombreCliente,v.AgenteCliente
+      GROUP BY YEAR(FechaEmision),v.Cliente,v.NombreCliente,v.AgenteCliente,a.ReportaA,a.Nombre
 
 
 
@@ -85,21 +91,26 @@ SELECT Cliente, MAX(VentaNeta),MIN(VentaNeta)
 
 
 
-   SELECT 
-    a.Cliente+' - '+a.Nombre	AS NombreCliente,
-    COALESCE(MAX(CASE WHEN Ejercicio = @Ejercicio1 THEN VentaNeta END),0) AS VentaNetaE1,
-    COALESCE(MAX(CASE WHEN Ejercicio = @Ejercicio2 THEN VentaNeta END),0) AS VentaNetaE2,
-    COALESCE(MAX(CASE WHEN Ejercicio = @Ejercicio3 THEN VentaNeta END),0) AS VentaNetaE3,
-	COALESCE(MAX(CASE WHEN Ejercicio = @Ejercicio4 THEN VentaNeta END),0) AS VentaNetaE4,
-	COALESCE(MAX(CASE WHEN Ejercicio = @Ejercicio5 THEN VentaNeta END),0) AS VentaNetaE5,
+   SELECT
+   Gerente,
+   d.Nombre					AS NombreGerente,
+   a.Agente					AS Agente,
+   a.NombreAgente			AS NombreAgente,
+   a.Cliente,
+   a.Nombre			AS NombreCliente,
+    ROUND(COALESCE(MAX(CASE WHEN Ejercicio = @Ejercicio1 THEN VentaNeta END),0),4) AS '2021',
+    ROUND(COALESCE(MAX(CASE WHEN Ejercicio = @Ejercicio2 THEN VentaNeta END),0),4) AS '2022',
+    ROUND(COALESCE(MAX(CASE WHEN Ejercicio = @Ejercicio3 THEN VentaNeta END),0),4) AS '2023',
+	ROUND(COALESCE(MAX(CASE WHEN Ejercicio = @Ejercicio4 THEN VentaNeta END),0),4) AS '2024',
+	ROUND(COALESCE(MAX(CASE WHEN Ejercicio = @Ejercicio5 THEN VentaNeta END),0),4) AS '2025',
 	CASE WHEN vMin = vMax THEN 0.00 ELSE vMin END	AS VentaMenor,
-	vMax	AS VentaMayor,
-	a.Agente+' - '+d.Nombre AS NombreAgente
-
+	vMax			AS VentaMayor,
+	Cuota= ''
 FROM @VentasBase						a
 JOIN @MaxMin							c		ON		c.Cliente=a.Cliente
-JOIN Agente							d		ON		d.Agente=a.Agente
-GROUP BY a.Cliente,a.Nombre,a.Agente,d.Nombre,vMin,vMax
+JOIN Agente								d		ON		d.Agente=a.Gerente
+
+GROUP BY a.Cliente,a.Nombre,d.Agente,a.NombreAgente,D.ReportaA,Gerente,/*e.Nombre,*/a.Agente,d.Nombre,vMin,vMax
 ORDER BY a.Cliente
 
 RETURN
