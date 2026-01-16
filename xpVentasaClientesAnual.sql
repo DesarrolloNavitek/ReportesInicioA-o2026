@@ -1,4 +1,4 @@
-/*Ventas año por cliente*/
+/*Ventas aÃ±o por cliente*/
 SET DATEFIRST 7
 SET ANSI_NULLS OFF
 SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
@@ -52,6 +52,7 @@ SELECT v.Cliente,
 		CASE WHEN COALESCE(a.ReportaA,'') = '' THEN v.AgenteCliente ELSE ReportaA END
  FROM nvk_vw_VentasNetas_Detalle_Cliente	v
  LEFT JOIN Agente							a			ON	v.AgenteCliente=a.Agente
+ JOIN Cte 									b			ON v.Cliente=b.cliente AND b.Estatus = 'ALTA'
 WHERE v.Estatus IN ('CONCLUIDO')
   AND v.Mov NOT IN ('Factura Activo Fijo')
   AND YEAR(v.FechaEmision) = @Ejercicio
@@ -113,5 +114,6 @@ SELECT	a.Gerente,
 RETURN
 END
 --select * from MovTipo where Modulo ='VTAS' and Clave = 'VTAS.P' and SubClave = 'VTAS.PNVK'
+
 
 --select distinct (mov) from nvk_vw_IngresosNetos_Detalle
