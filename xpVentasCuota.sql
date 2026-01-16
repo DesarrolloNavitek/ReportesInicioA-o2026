@@ -1,5 +1,5 @@
 
-/*Ventas año por cliente*/
+/*Ventas aÃ±o por cliente*/
 SET DATEFIRST 7
 SET ANSI_NULLS OFF
 SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
@@ -76,6 +76,7 @@ DISTINCT V.Cliente
 	MAX(CASE WHEN COALESCE(a.ReportaA,'') = '' THEN a.Agente ELSE a.ReportaA END)
    FROM  NVK_VW_HistVtaCte_2021_Hoy v
    JOIN Agente	a							ON a.Agente=v.AgenteCliente
+   JOIN Cte b								ON v.Cliente=b.cliente AND b.Estatus = 'ALTA'
    WHERE v.Mov NOT IN ('Factura Activo Fijo')
 	 AND YEAR(FechaEmision) BETWEEN @EjercicioD AND @EjercicioA
 	 AND v.Estatus = 'CONCLUIDO'
@@ -114,4 +115,5 @@ GROUP BY a.Cliente,a.Nombre,d.Agente,a.NombreAgente,D.ReportaA,Gerente,/*e.Nombr
 ORDER BY a.Cliente
 
 RETURN
+
 END
