@@ -33,7 +33,7 @@ DECLARE		@TotalF		TABLE	(
 
 DECLARE		@Pedidos	TABLE (
 			Cliente		varchar(10),
-			Pedidos		float
+			Pedidos		int
 )
 
 
@@ -73,6 +73,20 @@ WHERE v.Estatus IN ('CONCLUIDO')
 GROUP BY v.Cliente
 
 
+INSERT INTO @Pedidos
+
+SELECT v.Cliente,
+COUNT(DISTINCT v.MovID)
+ FROM Venta		v
+ JOIN MovTipo	mt ON v.Mov=mt.Mov AND mt.Modulo ='VTAS' --AND mt.Clave = 'VTAS.P'
+ LEFT JOIN	MovFlujo  mf	ON mf.OID=v.ID and OModulo ='VTAS' and DModulo = 'VTAS' and DMov = 'FActura' and Cancelado = 0
+WHERE v.Estatus IN ('CONCLUIDO')
+  AND v.Mov NOT IN ('Cotizacion')
+  AND YEAR(v.FechaEmision) = @Ejercicio
+  AND mt.SubClave = 'VTAS.PNVK'
+  --AND v.Cliente = '5236'
+  AND mf.OID IS NOT NULL
+GROUP BY v.Cliente
 
 SELECT	a.Gerente,
 		c.Nombre,
@@ -81,11 +95,14 @@ SELECT	a.Gerente,
 		a.Cliente,
 		a.NombreCliente,
 		ROUND(Ventas,4) AS VentaNeta, 
-		TFActuras AS TotalFacturas, 
+		TFActuras AS TotalFacturas,
+		COALESCE(Pedidos,0) AS Pedidos,
 		ROUND((Ventas/TFActuras),4) AS Factor
   FROM @Ventas			a
-  JOIN @TotalF			b	ON a.Cliente=b.Cliente
+  LEFT JOIN @TotalF			b	ON a.Cliente=b.Cliente
+  LEFT JOIN @Pedidos			d	ON a.Cliente=d.Cliente
   JOIN Agente			c	ON a.Gerente = c.Agente
+ WHERE Ventas > 0
  ORDER BY Factor ASC
 
  --EXEC xpVentasaClientesAnual
