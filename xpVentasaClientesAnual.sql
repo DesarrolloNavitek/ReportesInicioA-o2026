@@ -78,8 +78,8 @@ INSERT INTO @Pedidos
 SELECT v.Cliente,
 COUNT(DISTINCT v.MovID)
  FROM Venta		v
- JOIN MovTipo	mt ON v.Mov=mt.Mov AND mt.Modulo ='VTAS' --AND mt.Clave = 'VTAS.P'
- LEFT JOIN	MovFlujo  mf	ON mf.OID=v.ID and OModulo ='VTAS' and DModulo = 'VTAS' and DMov = 'FActura' and Cancelado = 0
+ JOIN MovTipo	mt ON v.Mov=mt.Mov AND mt.Modulo ='VTAS' AND mt.Clave = 'VTAS.P'
+ LEFT JOIN	MovFlujo  mf	ON mf.OID=v.ID and OModulo ='VTAS' and DModulo = 'VTAS' and DMov = 'Factura' and Cancelado = 0
 WHERE v.Estatus IN ('CONCLUIDO')
   AND v.Mov NOT IN ('Cotizacion')
   AND YEAR(v.FechaEmision) = @Ejercicio
@@ -87,6 +87,34 @@ WHERE v.Estatus IN ('CONCLUIDO')
   --AND v.Cliente = '5236'
   AND mf.OID IS NOT NULL
 GROUP BY v.Cliente
+  UNION
+  ALL
+SELECT v.Cliente,
+COUNT(DISTINCT v.MovID)
+ FROM Venta		v
+ JOIN MovTipo	mt ON v.Mov=mt.Mov AND mt.Modulo ='VTAS' AND mt.Clave = 'VTAS.P'
+ LEFT JOIN	MovFlujo  mf	ON mf.OID=v.ID and OModulo ='VTAS' and DModulo = 'VTAS' and DMov like '%Fatura%' and Cancelado = 0
+WHERE v.Estatus IN ('CONCLUIDO')
+  AND v.Mov NOT IN ('Cotizacion')
+  AND YEAR(v.FechaEmision) = @Ejercicio
+  AND mt.SubClave IN ('VTAS.EXPORT')
+  --AND v.Cliente = '11208'
+  --OR mf.OID IS NOT NULL
+GROUP BY v.Cliente
+
+
+--SELECT v.Cliente,
+--COUNT(DISTINCT v.MovID)
+-- FROM Venta		v
+-- JOIN MovTipo	mt ON v.Mov=mt.Mov AND mt.Modulo ='VTAS' --AND mt.Clave = 'VTAS.P'
+-- LEFT JOIN	MovFlujo  mf	ON mf.OID=v.ID and OModulo ='VTAS' and DModulo = 'VTAS' and DMov = 'FActura' and Cancelado = 0
+--WHERE v.Estatus IN ('CONCLUIDO')
+--  AND v.Mov NOT IN ('Cotizacion')
+--  AND YEAR(v.FechaEmision) = @Ejercicio
+--  AND mt.SubClave = 'VTAS.PNVK'
+--  --AND v.Cliente = '5236'
+--  AND mf.OID IS NOT NULL
+--GROUP BY v.Cliente
 
 SELECT	a.Gerente,
 		c.Nombre,
@@ -107,30 +135,6 @@ SELECT	a.Gerente,
 
  --EXEC xpVentasaClientesAnual
 
---INSERT INTO @Pedidos
 
---SELECT Cliente,
---		COUNT(MovID)
---  FROM Venta		v
---  JOIN MovTipo		mt		ON Modulo ='VTAS' AND v.Mov=mt.Mov
--- WHERE Estatus = 'CONCLUIDO'
---   AND v.Mov <> 'Cotizacion'
---   AND YEAR(v.FechaEmision) = 2025
---   and Clave = 'VTAS.P' 
---   and SubClave = 'VTAS.PNVK'
---  GROUP BY v.Cliente
--- ORDER BY v.Cliente
-
---SELECT a.Cliente+' - '+Nombre AS NombreClinte,
---		Ventas,
---		TFActuras AS TotalFacturacion,
---		Factor
---  FROM @Ventas			a
---  LEFT JOIN @Pedidos			b		ON a.Cliente=b.Cliente
---  ORDER BY Factor ASC
 RETURN
 END
---select * from MovTipo where Modulo ='VTAS' and Clave = 'VTAS.P' and SubClave = 'VTAS.PNVK'
-
-
---select distinct (mov) from nvk_vw_IngresosNetos_Detalle
