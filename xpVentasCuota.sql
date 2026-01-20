@@ -75,8 +75,8 @@ DISTINCT V.Cliente
 	a.Nombre,
 	MAX(CASE WHEN COALESCE(a.ReportaA,'') = '' THEN a.Agente ELSE a.ReportaA END)
    FROM  NVK_VW_HistVtaCte_2021_Hoy v
-   JOIN Agente	a							ON a.Agente=v.AgenteCliente
-   JOIN Cte b								ON v.Cliente=b.cliente AND b.Estatus = 'ALTA'
+   LEFT JOIN Agente	a							ON a.Agente=v.AgenteCliente
+   LEFT JOIN Cte b								ON v.Cliente=b.cliente AND b.Estatus = 'ALTA'
    WHERE v.Mov NOT IN ('Factura Activo Fijo')
 	 AND YEAR(FechaEmision) BETWEEN @EjercicioD AND @EjercicioA
 	 AND v.Estatus = 'CONCLUIDO'
@@ -117,3 +117,4 @@ ORDER BY a.Cliente
 RETURN
 
 END
+
