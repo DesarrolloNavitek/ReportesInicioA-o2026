@@ -137,4 +137,27 @@ SELECT	a.Gerente,
 
 
 RETURN
-END
+/******************* reporte cantidades   *****************/
+SELECT 
+    v.Articulo, 
+	max(a.Descripcion1) AS DescripcionArt,
+    Sum(Cantidad) As CantidadVenta,
+    DATENAME(month, v.FechaEmision) AS Periodo,  -- Devuelve 'January', 'February', etc.
+    YEAR(v.FechaEmision)		AS Ejercicio
+FROM NVK_VW_HistVtaCte_2021_Hoy v
+LEFT JOIN Art			a			on a.Articulo=v.Articulo
+WHERE v.Estatus IN ('CONCLUIDO')
+  AND v.MovTipo IN ('VTAS.F','VTAS.FB')
+  AND v.Mov NOT IN ('Factura Activo Fijo')
+  AND YEAR(FechaEmision) = 2024
+GROUP BY 
+    v.Articulo,
+    YEAR(v.FechaEmision),
+    DATENAME(month, v.FechaEmision),
+    DATEPART(mm, v.FechaEmision)  -- necesario para ordenar correctamente
+ORDER BY 
+    YEAR(v.FechaEmision),
+    DATEPART(mm, v.FechaEmision),  -- ordena por número de mes, no alfabéticamente
+    v.Articulo
+
+
