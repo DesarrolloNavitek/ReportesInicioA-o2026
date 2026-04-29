@@ -142,6 +142,7 @@ SELECT
     v.Articulo, 
 	max(a.Descripcion1) AS DescripcionArt,
     Sum(Cantidad) As CantidadVenta,
+	ROUND(SUM(ImporteFactura)-SUM(ImporteDevuelto)-SUM(ImporteCancelado) + SUM(ImporteCancelNCargo)-SUM(ImporteNotaCred),2,1) AS VentaNeta,
     DATENAME(month, v.FechaEmision) AS Periodo,  -- Devuelve 'January', 'February', etc.
     YEAR(v.FechaEmision)		AS Ejercicio
 FROM NVK_VW_HistVtaCte_2021_Hoy v
@@ -159,5 +160,3 @@ ORDER BY
     YEAR(v.FechaEmision),
     DATEPART(mm, v.FechaEmision),  -- ordena por número de mes, no alfabéticamente
     v.Articulo
-
-
